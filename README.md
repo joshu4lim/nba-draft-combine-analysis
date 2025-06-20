@@ -45,7 +45,7 @@ To prepare the dataset for analysis and modeling, we cleaned the data in the fol
 - **Narrowing Down Rows:** Since there are many data about NBA players, I first decide to narrow the dataset to currently active players (as of June 2025). Next, I narrow it down further to players who particpated in the Draft Combine, as some players opt out of it. In this step, I fetch both physical measurements and drill results of each player that participated in the Combine. Finally, I fetch name of college attended and career statistics of the pool of players I have. This step doesn't narrow down the rows since it all players have a career statistic, and players who didn't went to college can just be imputed with a NaN. This step narrowed down the dataset to 484 rows.
 
 - **Narrowing Down Columns:** 
-These are the columns I initially chose and their justifications.
+These are the columns I initially chose and their justifications:
 
 | `PLAYER_ID`              | Unique identifier for each player.                                          |
 | `full_name`              | Name of Player.                                                             |
@@ -63,7 +63,7 @@ These are the columns I initially chose and their justifications.
 | `STANDING_VERTICAL_LEAP` | Same as above.                                                              |
 | `BENCH_PRESS`            | Helps to infer player strength.                                             |
 | `SCHOOL_NAME`            | Used to infer conference strength.                                          |
-| `The following features below are used to create PER` |                                                |
+| `The following features below are used to create PER`                                                  |
 | `PTS`                    | Player's career points                                                      |
 | `REB`                    | Player's career rebounds                                                    |
 | `AST`                    | Player's career assists                                                     |
@@ -82,9 +82,7 @@ These are the columns I initially chose and their justifications.
 - **Data Types:** Some numerical columns were stored as strings (e.g. heights or weights extracted from the web API). We converted these to numeric types using `pd.to_numeric(..., errors='coerce')`.
 
 - **Creating PER Column:** Using career statistics (PTS, REB, etc.) and the PER formula, we create the PER column. 
-$$
-\text{EFF} = \frac{\text{PTS} + \text{REB} + \text{AST} + \text{STL} + \text{BLK} - (\text{Missed FG}) - (\text{Missed FT}) - \text{TO}}{\text{GP}}
-$$
+**PER** = (**PTS** + **REB** + **AST** + **STL** + **BLK** − *(Missed FG)* − *(Missed FT)* − **TO**) / **GP**
 Where Missed FG = FGA - FGM and Missed FT = FTA - FTM
 (https://en.wikipedia.org/wiki/Efficiency_(basketball)#EFF)
 
@@ -94,6 +92,7 @@ The final dataset is 286 x 24
 
 Here’s a preview of the cleaned dataset:
 
+<div style="overflow-x: auto;">
 |   PLAYER_ID | SCHOOL_NAME   |   STANDING_VERTICAL_LEAP |   MAX_VERTICAL_LEAP |   LANE_AGILITY_TIME |   THREE_QUARTER_SPRINT | full_name      | POSITION   |   HEIGHT_WO_SHOES |   WEIGHT |   WINGSPAN |   STANDING_REACH |   PTS |   REB |   AST |   STL |   BLK |   FGA |   FGM |   FTA |   FTM |   TOV |   GP |      PER |
 |------------:|:--------------|-------------------------:|--------------------:|--------------------:|-----------------------:|:---------------|:-----------|------------------:|---------:|-----------:|-----------------:|------:|------:|------:|------:|------:|------:|------:|------:|------:|------:|-----:|---------:|
 |      203500 | Pittsburgh    |                     28.5 |                33   |               11.85 |                   3.4  | Steven Adams   | C          |             82.75 |    254.5 |      88.5  |            109.5 |  6743 |  6115 |  1145 |   646 |   703 |  4786 |  2804 |  2129 |  1134 |  1083 |  764 | 14.7801  |
@@ -101,6 +100,7 @@ Here’s a preview of the cleaned dataset:
 |     1630534 | Kansas        |                     32   |                41.5 |               10.88 |                   3.13 | Ochai Agbaji   | SG         |             76.5  |    214.4 |      82    |            103.5 |  2044 |   795 |   331 |   168 |   133 |  1786 |   787 |   229 |   164 |   223 |  279 |  7.82796 |
 |     1641725 | Creighton     |                     29.5 |                34   |               11.6  |                   3.35 | Trey Alexander | SG         |             75.25 |    184.6 |      82    |            101.5 |    32 |    12 |    11 |     2 |     1 |    41 |    13 |     4 |     3 |     5 |   24 |  1       |
 |     1628960 | Duke          |                     32.5 |                40.5 |               10.31 |                   3.15 | Grayson Allen  | SG         |             75    |    198   |      79.25 |             97   |  4250 |  1216 |   812 |   293 |   112 |  3140 |  1416 |   657 |   563 |   399 |  403 | 11.0819  |
+</div>
 
 ---
 
@@ -128,19 +128,27 @@ There doesn't appears to be a **strong linear relationship** between height and 
 
 ### 📊 Interesting Aggregates
 
-We grouped players by **college conference** and calculated their **average PER**.
+We grouped players by **Position** and calculated the **median PER**.
 
-| Conference     | Avg PER |
-|----------------|---------|
-| SEC            | 15.2    |
-| Big Ten        | 16.1    |
-| ACC            | 16.7    |
-| Big 12         | 14.8    |
-| Pac-12         | 13.4    |
-| West Coast     | 16.9    |
+| POSITION   |      PER |
+|:-----------|---------:|
+| PG-SG      | 17.5278  |
+| PF-SF      | 16.756   |
+| C-PF       | 14.4618  |
+| SF-SG      | 13.2562  |
+| PF-C       | 12.8379  |
+| SG-PG      | 11.3666  |
+| SF-PF      |  9.47372 |
+| SG-SF      |  9.42649 |
+| PF         |  9.19232 |
+| C          |  9.17965 |
+| PG         |  9.00727 |
+| SG         |  8.5     |
+| SF         |  8.24883 |
 
 **Interpretation:**  
-Players from conferences like the **ACC** and **West Coast** show slightly higher average PERs, suggesting that some conferences may better prepare players for professional success. This motivated our decision to engineer a new categorical feature for **conference strength** in our pipeline.
+
+I used the median since mean is affected by outlier, which basketball has a lot of in terms of star players or bench players or rookies who barely get minutes to play. Interestingly, players with hybrid positions seemed to have the highest PER medians compared to tradition one position players, suggesting that the NBA is transitioning into a more flexible playstyle.
 
 ---
 
