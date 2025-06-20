@@ -293,8 +293,8 @@ We used `GridSearchCV` with 5-fold cross-validation on the training set to ident
 
 | Model           | Features Used                         | MAE (Mean Absolute Error) |
 |-----------------|----------------------------------------|----------------------------|
-| Baseline Model  | HEIGHT_WO_SHOES, LANE_AGILITY_TIME    | **3.64**                   |
-| Final Model     | + 7 physical/drill features, conference encoding | **3.61**          |
+| Baseline Model  | HEIGHT_WO_SHOES, LANE_AGILITY_TIME    | **~3.64**                   |
+| Final Model     | + 7 physical/drill features, conference encoding | **~3.61**          |
 
 While the numerical improvement in MAE is modest, the final model **uses a more complete picture of a player's profile** and is likely to generalize better to unseen data due to its ensemble nature and better treatment of nonlinearities. However, the slight improvement suggests that Draft Combine statistics and school Conference soley do not determine a player's PER, and requires more complex features or models for a better prediction. 
 
