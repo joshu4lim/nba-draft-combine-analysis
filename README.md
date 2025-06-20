@@ -244,3 +244,66 @@ Thus, while the baseline is useful as a starting point, it is not a good model o
 
 ## Final Model
 
+### 🚀 Final Model: Feature Justification and Performance
+
+#### 🔍 Feature Engineering and Why It Matters
+
+To improve upon our baseline model, we introduced several additional features and transformations:
+
+- **Physical Measurements** (`HEIGHT_WO_SHOES`, `WEIGHT`, `WINGSPAN`, `STANDING_REACH`):  
+  These features represent a player's physical profile, which is an important aspect of player potential performance. Taller, longer players tend to have advantages in rebounding, shot blocking, and overall presence on the court.
+
+- **Athletic Drill Results** (`LANE_AGILITY_TIME`, `MAX_VERTICAL_LEAP`, `STANDING_VERTICAL_LEAP`, `THREE_QUARTER_SPRINT`):  
+  These are direct measurements of a player’s explosiveness, speed, and vertical ability — traits that strongly correlate with athletic success in the NBA.
+
+- **College Program (`SCHOOL_NAME`) mapped to NCAA Conference**:  
+  We engineered a new categorical feature by mapping each player’s school to their NCAA conference. This helps capture the **strength of competition** faced in college. Players from power conferences may have better preparation for the NBA, resulting to better performance.
+
+- **Standardization & Aggregation**:  
+  Instead of using each physical or drill stat independently, we standardized each group and created **summary features** (mean z-score). This helps reduce multicollinearity and highlights the player’s relative strengths in those areas.
+
+---
+
+#### 🧠 Modeling Algorithm: Gradient Boosting
+
+We used a **Gradient Boosting Regressor**, which builds an ensemble of shallow decision trees in a sequential fashion. Each new tree corrects the errors made by the previous trees, allowing the model to learn **non-linear relationships** in the data.
+
+This algorithm is good for tabular datasets like ours, especially when features may interact in non-obvious ways (i.e., a tall player with a fast sprint time may outperform shorter but equally fast players).
+
+---
+
+#### 🎛️ Hyperparameter Tuning
+
+To avoid overfitting or underfitting, we used `GridSearchCV` to tune the following key hyperparameters:
+
+| Hyperparameter   | Why It Matters                                                                 |
+|------------------|--------------------------------------------------------------------------------|
+| `n_estimators`   | Number of trees (more trees = better fit, but can overfit)                     |
+| `learning_rate`  | Controls how much each tree corrects previous errors (small = more conservative learning) |
+| `max_depth`      | Maximum depth of each tree (controls tree complexity and overfitting risk)     |
+
+We used `GridSearchCV` with 5-fold cross-validation on the training set to identify the best combination of these parameters.
+
+**Best Parameters Found**:  
+`n_estimators=100`, `learning_rate=0.1`, `max_depth=3`
+
+---
+
+#### 📊 Performance Comparison
+
+| Model           | Features Used                         | MAE (Mean Absolute Error) |
+|-----------------|----------------------------------------|----------------------------|
+| Baseline Model  | HEIGHT_WO_SHOES, LANE_AGILITY_TIME    | **3.64**                   |
+| Final Model     | + 7 physical/drill features, conference encoding | **3.61**          |
+
+While the numerical improvement in MAE is modest, the final model **uses a more complete picture of a player's profile** and is likely to generalize better to unseen data due to its ensemble nature and better treatment of nonlinearities. However, the slight improvement suggests that Draft Combine statistics and school Conference soley do not determine a player's PER, and requires more complex features or models for a better prediction. 
+
+---
+
+#### 📌 Summary
+
+- We enhanced the model with features that are **available at draft time**.
+- Gradient Boosting was chosen to model complex interactions and nonlinear trends.
+- GridSearchCV was used to tune key hyperparameters.
+- The final model slighlty improves on baseline MAE, indicating that a player's Draft Combine peformance and school Conference aren't the primary deciders of how a player will perform in the NBA.
+- One challenge that might have dampened the model's prediction accuracy could be how there were many NaN school names (74 rows), which could have added noise. 
