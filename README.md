@@ -163,5 +163,84 @@ I used the median since mean is affected by outlier, which basketball has a lot 
 ---
 
 ## Framing a Prediction Problem
+
+### ✅ Prediction Problem Type
+
+This is a **regression** problem. We are predicting a continuous numerical variable — **Player Efficiency Rating (PER)** — using a set of physical and drill measurements from the NBA Draft Combine, as well as the player’s college program.
+
+---
+
+### 🎯 Response Variable
+
+The **response variable** (i.e. target variable) we are predicting is:
+
+> **PER (Player Efficiency Rating)** — a summary statistic representing a player's overall NBA performance.
+
+We chose PER over other stats because:
+- It is a widely-used, standardized, and interpretable measure of overall NBA performance.
+- It is continuous and allows us to differentiate subtle performance differences between players.
+- It can be easily calculated from public career stats.
+
+---
+
+### 🔍 Type of Model: Predictive
+
+We are building a **predictive model**, not an inferential one. That is, our goal is to **predict a player’s future NBA performance** (measured by PER) based on data that would be available at the time of the NBA Draft — specifically:
+
+- **Physical and athletic combine data** (height, sprint times, vertical leap, etc.)
+- **College attended**, which we map to conference strength
+
+All of these features are available before a player’s professional career begins, making this a valid prediction task that **does not leak information from the future**.
+
+---
+
+### 🧪 Evaluation Metric
+
+We evaluate our model using **Mean Absolute Error (MAE)**. This metric was chosen because:
+
+- **PER is a continuous variable**, so MAE is a natural choice for regression tasks.
+- MAE measures the average absolute magnitude of prediction errors, making it easy to interpret on the same scale as the target variable (PER).
+- Unlike MSE, MAE has a equal weighting of absolute errors, making it more robust to outliers. This is valuable in our case, since PER can vary widely and a few extreme players (i.e., MVP-caliber superstar athletes, bench players who get garbage minutes) shouldn't disproportionately influence model performance.
+
+Alternative metrics like MSE were considered, but MAE was ultimately chosen because it offers a clear, interpretable measure of average absolute prediction error without being overly sensitive to extreme values, aligning with our goal of producing stable and reliable PER predictions across the full range of players.
+
 ## Baseline Model
+
+### 🔧 Baseline Model
+
+For our baseline model, we used a **Linear Regression** algorithm with two quantitative features from the NBA Draft Combine:
+
+- `HEIGHT_WO_SHOES`: Player’s height in inches (measured without shoes)  
+- `LANE_AGILITY_TIME`: Time to complete the lane agility drill (in seconds)
+
+These two features were chosen as simple physical indicators of player performance.
+
+### 🧮 Feature Breakdown
+
+- **Quantitative Features**: 2  
+- **Ordinal Features**: 0  
+- **Nominal Features**: 0  
+
+Since both features are quantitative, no encoding was needed. A `StandardScaler` was used to normalize them before feeding into the regression model. This was implemented using an `sklearn` Pipeline.
+
+### ⚙️ Model Pipeline
+
+1. `StandardScaler` – to scale input features  
+2. `LinearRegression` – basic regression model
+
+### 📈 Model Performance
+
+- **Mean Absolute Error (MAE)**: **~3.64**
+
+This means the model’s predictions for PER are off by about 3.64 on average.
+
+### ✅ Evaluation
+
+While this model is straightforward, it only considers two features and assumes a linear relationship. It does not capture nonlinear interactions or leverage other potentially valuable information such as other drill results, physical measurements, or school attended.
+
+For example, when predicting a terrible 5 feet player with a 20 second lane agility time, we get a PER of 13.84, which is actually above average PER.
+
+Thus, while the baseline is useful as a starting point, it is not a good model on its own. Further feature engineering and advanced models are likely required for better predictive accuracy.
+
 ## Final Model
+
