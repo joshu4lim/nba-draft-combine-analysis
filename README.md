@@ -117,12 +117,12 @@ There is almost a bell-shaped distribution with a slight right-skew for height w
 
 ### 📈 Bivariate Analysis
 
-Next, we examined how **WINGSPAN** relates to **PER**.
+Next, we examined how **Height without Shoes** relates to **PER**.
 
 <iframe src="plots/biv-height-by-per-plot.html" width="800" height="500" frameborder="0"></iframe>
 
 **Interpretation:**  
-There appears to be a **mild positive relationship** between wingspan and PER. Players with longer wingspans tend to achieve slightly higher PERs, which makes sense since reach can be advantageous in defense, rebounding, and shot-blocking.
+There doesn't appears to be a **strong linear relationship** between height and PER, where most players cluster around 76-80 inches with a wide range of PER. Elite PER > 20 occurs in various heights, suggesting that height alone does not predict PER reliably. 
 
 ---
 
